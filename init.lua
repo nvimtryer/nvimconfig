@@ -1,7 +1,7 @@
 -- Basics
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
+local augroup = vim.api.nvim_create_augroup('UserConfig', {})
 -- Color scheme/appearance
 vim.cmd 'colorscheme industry'
 --vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
@@ -15,7 +15,15 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.scrolloff = 10 -- Keep 10 lines above/below cursor
 vim.opt.sidescrolloff = 8 -- Keep 8 columns left/right of cursor
-
+-- Disable line numbers in terminal
+vim.api.nvim_create_autocmd('TermOpen', {
+  group = augroup,
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = 'no'
+  end,
+})
 -- indents and tabs
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
@@ -29,11 +37,17 @@ vim.keymap.set('v', '<', '<gv', { desc = 'Indent left and reselect' }) -- Better
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent right and reselect' })
 vim.cmd 'autocmd FileType * set formatoptions-=cro' -- gets rid of auto bullets
 
--- Search
+--------SEARCH SETTINGS--------------------------------------------------------------
 vim.opt.hlsearch = true
-vim.opt.wildmenu = true
 vim.opt.ignorecase = true -- Case insensitive search
 vim.opt.smartcase = true -- Case sensitive if uppercase in search
+vim.keymap.set('n', '<leader>e', ':Explore<CR>', { desc = 'Open file explorer' })
+vim.keymap.set('n', '<leader>ff', ':find ', { desc = 'Find file' })
+vim.keymap.set('n', '<leader>c', ':nohlsearch<CR>', { desc = 'Clear search highlights' })
+-- Command-line completion
+vim.opt.wildmenu = true
+vim.opt.wildmode = 'longest:full,full'
+vim.opt.wildignore:append { '*.o', '*.obj', '*.pyc', '*.class', '*.jar' }
 
 -- Behavioral Settings
 vim.opt.encoding = 'UTF-8' -- Set encoding
@@ -46,12 +60,11 @@ vim.opt.iskeyword:append '-' -- Treat dash as part of word
 vim.opt.selection = 'exclusive' -- Selection behavior
 vim.opt.modifiable = true -- Allow buffer modifications
 
--- Mouse/Cursor
+---------------------------------------------Mouse/Cursor------------------------------------------
 vim.o.mouse = 'a' -- Enable mouse mode
 vim.opt.guicursor =
   'n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkoff250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkoff175'
-
--- Visual settings
+--------------Visual settings----------------------------------------------------------------------
 vim.opt.termguicolors = true -- Enable 24-bit colors
 vim.opt.signcolumn = 'no' -- Always show sign column
 vim.opt.colorcolumn = '100' -- Show column at 100 characters
@@ -68,7 +81,7 @@ vim.opt.concealcursor = '' -- Don't hide cursor line markup
 --vim.opt.lazyredraw = true -- Don't redraw during macros
 vim.opt.synmaxcol = 300 -- Syntax highlighting limit
 
--- File handling
+----------------------------File handling--------------------------------------------------------
 vim.opt.backup = false -- Don't create backup files
 vim.opt.writebackup = false -- Don't create backup before writing
 vim.opt.swapfile = false -- Don't create swap files
@@ -77,72 +90,7 @@ vim.opt.timeoutlen = 500 -- Key timeout duration
 vim.opt.ttimeoutlen = 0 -- Key code timeout
 vim.opt.autoread = true -- Auto reload files changed outside vim
 vim.opt.autowrite = false -- Don't auto save
-
--- Folding settings
-vim.opt.foldexpr = 'nvim_treesitter#foldexpr()' -- Use treesitter for folding
-vim.opt.foldlevel = 99 -- Start with all folds open
-
---------SEARCH SETTINGS--------------------------------------------------------------
-vim.keymap.set('n', '<leader>e', ':Explore<CR>', { desc = 'Open file explorer' })
-vim.keymap.set('n', '<leader>ff', ':find ', { desc = 'Find file' })
-vim.keymap.set('n', '<leader>c', ':nohlsearch<CR>', { desc = 'Clear search highlights' })
-
-----------------------NAVIGATION--------------------------------------------------
-vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
-vim.keymap.set('n', 'N', 'Nzzzv', { desc = 'Previous search result (centered)' })
-vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down (centered)' })
-vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Half page up (centered)' })
-vim.keymap.set('n', '<leader>bn', ':bnext<CR>', { desc = 'Next buffer' })
-vim.keymap.set('n', '<leader>bp', ':bprevious<CR>', { desc = 'Previous buffer' })
--------------------------------------LINE BEHAVIOR-------------------------------
-vim.keymap.set('n', '<A-j>', ':m .+1<CR>==', { desc = 'Move line down' })
-vim.keymap.set('n', '<A-k>', ':m .-2<CR>==', { desc = 'Move line up' })
-vim.keymap.set('v', '<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move selection down' })
-vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
-vim.keymap.set('n', 'J', 'mzJ`z', { desc = 'Join lines and keep cursor position' }) -- Better J behavior
-
----------------------------------- WINDOWS BINDINGS -------------------------------------
-vim.opt.splitbelow = true -- Horizontal splits go below
-vim.opt.splitright = false -- Vertical splits go left
-
-vim.keymap.set('n', '<leader>sv', ':vsplit<CR>', { desc = 'Split window vertically' })
-vim.keymap.set('n', '<leader>sh', ':split<CR>', { desc = 'Split window horizontally' })
-
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- Auto-resize splits when window is resized
-vim.api.nvim_create_autocmd('VimResized', {
-  group = augroup,
-  callback = function()
-    vim.cmd 'tabdo wincmd ='
-  end,
-})
-
------------------------------USEFUL FUNCTIONS----------------------------------
--- Copy Full File-Path
-vim.keymap.set('n', '<leader>pa', function()
-  local path = vim.fn.expand '%:p'
-  vim.fn.setreg('+', path)
-  print('file:', path)
-end)
-
--- Basic autocommands
-local augroup = vim.api.nvim_create_augroup('UserConfig', {})
---
--- Command-line completion
-vim.opt.wildmenu = true
-vim.opt.wildmode = 'longest:full,full'
-vim.opt.wildignore:append { '*.o', '*.obj', '*.pyc', '*.class', '*.jar' }
-
--- Better diff options
-vim.opt.diffopt:append 'linematch:60'
-
--- Performance improvements
-vim.opt.redrawtime = 10000
-vim.opt.maxmempattern = 20000
+vim.opt.diffopt:append 'linematch:60' -- Better diff options
 -- Set filetype-specific settings
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup,
@@ -162,26 +110,6 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- Auto-close terminal when process exits
-vim.api.nvim_create_autocmd('TermClose', {
-  group = augroup,
-  callback = function()
-    if vim.v.event.status == 0 then
-      vim.api.nvim_buf_delete(0, {})
-    end
-  end,
-})
-
--- Disable line numbers in terminal
-vim.api.nvim_create_autocmd('TermOpen', {
-  group = augroup,
-  callback = function()
-    vim.opt_local.number = false
-    vim.opt_local.relativenumber = false
-    vim.opt_local.signcolumn = 'no'
-  end,
-})
-
 -- Create directories when saving files
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = augroup,
@@ -193,7 +121,6 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   end,
 })
 
--- Undo settings
 vim.opt.undofile = true -- Persistent undo
 local undodir = vim.fn.expand '~/.vim/undodir' -- Create undo directory if it doesn't exist
 if vim.fn.isdirectory(undodir) == 0 then
@@ -214,29 +141,59 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     end
   end,
 })
+----------------------------Folding settings-------------------------------------
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()' -- Use treesitter for folding
+vim.opt.foldlevel = 99 -- Start with all folds open
 
----------------------------------YANKING-----------------------------------------
-vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank to end of line' }) -- Y to EOL
-vim.keymap.set('x', '<leader>p', '"_dP', { desc = 'Paste without yanking' })
-vim.keymap.set({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'Delete without yanking' })
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.hl.on_yank()`
-vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.hl.on_yank()
-  end,
-})
--- Highlight yanked text
---[[vim.api.nvim_create_autocmd('TextYankPost', {
+----------------------NAVIGATION--------------------------------------------------
+vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next search result (centered)' })
+vim.keymap.set('n', 'N', 'Nzzzv', { desc = 'Previous search result (centered)' })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down (centered)' })
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Half page up (centered)' })
+vim.keymap.set('n', '<leader>bn', ':bnext<CR>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>bp', ':bprevious<CR>', { desc = 'Previous buffer' })
+-------------------------------------LINE BEHAVIOR-------------------------------
+vim.keymap.set('n', '<A-j>', ':m .+1<CR>==', { desc = 'Move line down' })
+vim.keymap.set('n', '<A-k>', ':m .-2<CR>==', { desc = 'Move line up' })
+vim.keymap.set('v', '<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move selection down' })
+vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
+vim.keymap.set('n', 'J', 'mzJ`z', { desc = 'Join lines and keep cursor position' }) -- Better J behavior
+
+--------------------------------------WINDOWS---------------------------------------
+vim.opt.splitbelow = true -- Horizontal splits go below
+vim.opt.splitright = false -- Vertical splits go left
+
+vim.keymap.set('n', '<leader>sv', ':vsplit<CR>', { desc = 'Split window vertically' })
+vim.keymap.set('n', '<leader>sh', ':split<CR>', { desc = 'Split window horizontally' })
+
+vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+-- Auto-resize splits when window is resized
+vim.api.nvim_create_autocmd('VimResized', {
   group = augroup,
   callback = function()
-    vim.highlight.on_yank()
+    vim.cmd 'tabdo wincmd ='
   end,
 })
-]]
+
+-----------------------------USEFUL FUNCTIONS----------------------------------
+-- Performance improvements
+vim.opt.redrawtime = 10000
+vim.opt.maxmempattern = 20000
+
+-- Auto-close terminal when process exits
+vim.api.nvim_create_autocmd('TermClose', {
+  group = augroup,
+  callback = function()
+    if vim.v.event.status == 0 then
+      vim.api.nvim_buf_delete(0, {})
+    end
+  end,
+})
+
 -------------------- System Clipboard ----------------------------------------------------------
 -- "unnamed" maps to the * register (usually system clipboard)
 -- Tells Neovim to use OSC 52 for yanking
@@ -260,6 +217,34 @@ vim.g.clipboard = {
     ['*'] = paste,
   },
 }
+---------------------------------YANKING-----------------------------------------
+vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank to end of line' }) -- Y to EOL
+vim.keymap.set('x', '<leader>p', '"_dP', { desc = 'Paste without yanking' })
+vim.keymap.set({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'Delete without yanking' })
+-- Highlight when yanking (copying) text
+--  Try it with `yap` in normal mode
+--  See `:help vim.hl.on_yank()`
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  callback = function()
+    vim.hl.on_yank()
+  end,
+})
+-- Copy Full File-Path
+vim.keymap.set('n', '<leader>pa', function()
+  local path = vim.fn.expand '%:p'
+  vim.fn.setreg('+', path)
+  print('file:', path)
+end)
+-- Highlight yanked text
+--[[vim.api.nvim_create_autocmd('TextYankPost', {
+  group = augroup,
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
+]]
 ---------------------------------------------PLUGINS----------------------------------------------
 --------------------------------------------------------------------------------------------------
 -- [[ Install `lazy.nvim` plugin manager ]]
