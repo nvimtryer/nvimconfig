@@ -7,7 +7,7 @@ vim.cmd 'colorscheme industry'
 --vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
 --vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
 --vim.api.nvim_set_hl(0, 'EndOfBuffer', { bg = 'none' })
-vim.g.have_nerd_font = false -- Set to true if you have Nerd Font selected in terminal
+vim.g.have_nerd_font = true -- Set to true if you have Nerd Font selected in terminal
 
 --Column/Numbering
 vim.opt.colorcolumn = '80'
@@ -43,6 +43,7 @@ vim.opt.ignorecase = true -- Case insensitive search
 vim.opt.smartcase = true -- Case sensitive if uppercase in search
 vim.keymap.set('n', '<leader>e', ':Explore<CR>', { desc = 'Open file explorer' })
 vim.keymap.set('n', '<leader>ff', ':find ', { desc = 'Find file' })
+vim.keymap.set('n', '<leader>dm', ':DiffviewOpen ', { desc = 'load Diffview to put in file name' })
 vim.keymap.set('n', '<leader>c', ':nohlsearch<CR>', { desc = 'Clear search highlights' })
 -- Command-line completion
 vim.opt.wildmenu = true
@@ -165,6 +166,11 @@ vim.opt.splitright = false -- Vertical splits go left
 
 vim.keymap.set('n', '<leader>sv', ':vsplit<CR>', { desc = 'Split window vertically' })
 vim.keymap.set('n', '<leader>sh', ':split<CR>', { desc = 'Split window horizontally' })
+
+vim.keymap.set('n', '<C-Up>', ':resize +2<CR>', { desc = 'Increase window height' })
+vim.keymap.set('n', '<C-Down>', ':resize -2<CR>', { desc = 'Decrease window height' })
+vim.keymap.set('n', '<C-Left>', ':vertical resize -2<CR>', { desc = 'Decrease window width' })
+vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>', { desc = 'Increase window width' })
 
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
@@ -504,6 +510,17 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
     end,
   },
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('nvim-tree').setup {}
+    end,
+  },
   -- LSP Plugins
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -517,6 +534,27 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'sindrets/diffview.nvim',
+    dependencies = {
+      { 'nvim-tree/nvim-web-devicons', lazy = true },
+    },
+    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewFileHistory' },
+    keys = {
+      {
+        '<leader>dv',
+        function()
+          if next(require('diffview.lib').views) == nil then
+            vim.cmd 'DiffviewOpen'
+          else
+            vim.cmd 'DiffviewClose'
+          end
+        end,
+        desc = 'Toggle Diffview window',
+      },
+    },
+  },
+
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -668,6 +706,19 @@ require('lazy').setup({
         end,
       })
 
+      -- Jump to the previous diagnostic
+      vim.keymap.set('n', '<leader>pd', function()
+        vim.diagnostic.jump { count = -1, float = true }
+      end)
+
+      -- Jump to the next diagnostic
+      vim.keymap.set('n', '<leader>nd', function()
+        vim.diagnostic.jump { count = 1, float = true }
+      end)
+
+      -- Show diagnostic in a floating window (this remains the same)
+      vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
+      -- LSP servers and clients are able to communicate to each other what features they support.
       -- Diagnostic Config
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
@@ -697,19 +748,6 @@ require('lazy').setup({
         },
       }
 
-      -- Jump to the previous diagnostic
-      vim.keymap.set('n', '<leader>pd', function()
-        vim.diagnostic.jump { count = -1, float = true }
-      end)
-
-      -- Jump to the next diagnostic
-      vim.keymap.set('n', '<leader>nd', function()
-        vim.diagnostic.jump { count = 1, float = true }
-      end)
-
-      -- Show diagnostic in a floating window (this remains the same)
-      vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
-      -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
