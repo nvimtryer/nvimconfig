@@ -1,0 +1,60 @@
+Diagnostics
+<leader>sd -> search diagnostic
+<leader>e -> diagnostics floating window
+
+<leader>gc -> clear floating window definition
+
+<leader>pd -> prev diagnostic
+<leader>nd -> next diagnostic
+
+Definitions
+<leader>gp -> goto preview (floating)
+<leader>gc -> clear floating window (floating)
+
+File Searching/nav
+:find OR <leader>ff -> for relative path
+<leader>fd -> file directory
+<leader>pa -> copy full file path
+<leader>tt -> open file explorer to left
+<leader>bp -> buffer prev
+<leader>bn -> buffer next
+<leader>/ -> fuzzy finder in current buffer
+
+LSP:
+<leader>grn -> rename variable
+<leader>grr -> get references
+<leader>gs -> fuzzy find all symbols in curr doc
+<leader>gd -> get definition -> cntrl+t to go back
+<leader>gD -> get implementation
+<leader>gS -> fuzzyfind all symbols in workspace
+<leader>gt -> jump to type of word
+
+Git
+<leader>dv -> diffview close/open (against curr branch) 
+<leader>dm -> load diffview
+cntrl+p -> search within git
+
+Line Behavior
+normal: alt+jk -> move line
+visual: alt+jk -> move selection
+J -> join line below to curr line and keep cursor pos
+<leader>c -> noh
+
+Yanking
+<leader>d -> delete without yank
+
+Windows:
+<leader>sv -> split vertically
+<leader>sh -> split horizontally
+<C>hjkl -> navigate windows
+
+<C-A>hjkl -> move windows
+
+C-up/right - increase window
+C-down/left - decrease window
+
+C-w HJKL -> move windows
+
+Format
+<leader>f -> autoformat
+

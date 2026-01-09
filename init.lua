@@ -41,14 +41,19 @@ vim.cmd 'autocmd FileType * set formatoptions-=cro' -- gets rid of auto bullets
 vim.opt.hlsearch = true
 vim.opt.ignorecase = true -- Case insensitive search
 vim.opt.smartcase = true -- Case sensitive if uppercase in search
-vim.keymap.set('n', '<leader>e', ':Explore<CR>', { desc = 'Open file explorer' })
+vim.keymap.set('n', '<leader>fe', ':Explore<CR>', { desc = 'Open file explorer' })
 vim.keymap.set('n', '<leader>ff', ':find ', { desc = 'Find file' })
 vim.keymap.set('n', '<leader>dm', ':DiffviewOpen ', { desc = 'load Diffview to put in file name' })
 vim.keymap.set('n', '<leader>c', ':nohlsearch<CR>', { desc = 'Clear search highlights' })
+
+------------CHEATSHEET-----------------------------------------------------------------
+vim.keymap.set('n', '<leader>cs', ':vsplit<CR> <C-w><C-l> :find ~/.config/nvim/cheatsheet.txt<CR>', { desc = 'Find file' })
+
 -- Command-line completion
 vim.opt.wildmenu = true
 vim.opt.wildmode = 'longest:full,full'
-vim.opt.wildignore:append { '*.o', '*.obj', '*.pyc', '*.class', '*.jar' }
+vim.opt.wildignore:append { 'venv', '.git', '*.o', '*.obj', '*.pyc', '*.class', '*.jar' } -- ignore these
+vim.opt.path:append './' -- include subdirectories in search - WAY TOO SLOW
 
 -- Behavioral Settings
 vim.opt.encoding = 'UTF-8' -- Set encoding
@@ -57,7 +62,6 @@ vim.opt.errorbells = false -- No error bells
 vim.opt.backspace = 'indent,eol,start' -- Better backspace behavior
 vim.opt.autochdir = false -- Don't auto change directory
 vim.opt.iskeyword:append '-' -- Treat dash as part of word
---vim.opt.path:append '**' -- include subdirectories in search
 vim.opt.selection = 'exclusive' -- Selection behavior
 vim.opt.modifiable = true -- Allow buffer modifications
 
@@ -153,6 +157,7 @@ vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down (centered)' })
 vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Half page up (centered)' })
 vim.keymap.set('n', '<leader>bn', ':bnext<CR>', { desc = 'Next buffer' })
 vim.keymap.set('n', '<leader>bp', ':bprevious<CR>', { desc = 'Previous buffer' })
+
 -------------------------------------LINE BEHAVIOR-------------------------------
 vim.keymap.set('n', '<A-j>', ':m .+1<CR>==', { desc = 'Move line down' })
 vim.keymap.set('n', '<A-k>', ':m .-2<CR>==', { desc = 'Move line up' })
@@ -164,8 +169,8 @@ vim.keymap.set('n', 'J', 'mzJ`z', { desc = 'Join lines and keep cursor position'
 vim.opt.splitbelow = true -- Horizontal splits go below
 vim.opt.splitright = false -- Vertical splits go left
 
-vim.keymap.set('n', '<leader>sv', ':vsplit<CR>', { desc = 'Split window vertically' })
-vim.keymap.set('n', '<leader>sh', ':split<CR>', { desc = 'Split window horizontally' })
+vim.keymap.set('n', '<leader>sv', ':vsplit<CR> <C-w><C-l>', { desc = 'Split window vertically' })
+vim.keymap.set('n', '<leader>sh', ':split<CR> <C-w><C-k>', { desc = 'Split window horizontally' })
 
 vim.keymap.set('n', '<C-Up>', ':resize +2<CR>', { desc = 'Increase window height' })
 vim.keymap.set('n', '<C-Down>', ':resize -2<CR>', { desc = 'Decrease window height' })
@@ -177,6 +182,10 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.keymap.set('n', '<C-A-h>', '<C-w>H', { desc = 'Move window to the left' })
+vim.keymap.set('n', '<C-A-l>', '<C-w>L', { desc = 'Move window to the right' })
+vim.keymap.set('n', '<C-A-j>', '<C-w>J', { desc = 'Move window to the lower' })
+vim.keymap.set('n', '<C-A-k>', '<C-w>K', { desc = 'Move window to the upper' })
 -- Auto-resize splits when window is resized
 vim.api.nvim_create_autocmd('VimResized', {
   group = augroup,
@@ -383,6 +392,41 @@ require('lazy').setup({
     },
   },]]
   --
+  {
+    'rmagatti/goto-preview',
+    dependencies = { 'rmagatti/logger.nvim' },
+    event = 'BufEnter',
+    config = function()
+      -- necessary as per https://github.com/rmagatti/goto-preview/issues/88
+      require('goto-preview').setup {
+        width = 120, -- Width of the floating window
+        height = 15, -- Height of the floating window
+        border = { '↖', '─', '┐', '│', '┘', '─', '└', '│' }, -- Border characters of the floating window
+        default_mappings = false, -- Bind default mappings
+        debug = false, -- Print debug information
+        opacity = nil, -- 0-100 opacity level of the floating window where 100 is fully transparent.
+        resizing_mappings = false, -- Binds arrow keys to resizing the floating window.
+        post_open_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+        post_close_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+        references = { -- Configure the telescope UI for slowing the references cycling window.
+          provider = 'telescope', -- telescope|fzf_lua|snacks|mini_pick|default
+          telescope = require('telescope.themes').get_dropdown { hide_preview = false },
+        },
+        -- These two configs can also be passed down to the goto-preview definition and implementation calls for one off "peak" functionality.
+        focus_on_open = true, -- Focus the floating window when opening it.
+        dismiss_on_move = false, -- Dismiss the floating window when moving the cursor.
+        force_close = true, -- passed into vim.api.nvim_win_close's second argument. See :h nvim_win_close
+        bufhidden = 'wipe', -- the bufhidden option to set on the floating window. See :h bufhidden
+        stack_floating_preview_windows = true, -- Whether to nest floating windows
+        same_file_float_preview = true, -- Whether to open a new floating window for a reference within the current file
+        preview_window_title = { enable = true, position = 'left' }, -- Whether to set the preview window title as the filename
+        zindex = 1, -- Starting zindex for the stack of floating windows
+        vim_ui_input = true, -- Whether to override vim.ui.input with a goto-preview floating window
+      }
+    end,
+    vim.keymap.set('n', '<leader>gp', "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", { noremap = true }),
+    vim.keymap.set('n', '<leader>gc', "<cmd>lua require('goto-preview').close_all_win()<CR>", { noremap = true }),
+  },
 
   -- NOTE: Plugins can specify dependencies.
   --
@@ -473,6 +517,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 --]]
+      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -482,32 +527,31 @@ require('lazy').setup({
         })
       end, { desc = '[/] Fuzzily search in current buffer' })
 
-      -- It's also possible to pass additional configuration options.
-      --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      --[[vim.keymap.set('n', '<leader>s/', function()
+      vim.keymap.set('n', '<leader>fd', function()
+        builtin.find_files {
+          no_ignore = true, -- Don't respect .gitignore
+          hidden = true, -- Show dotfiles
+        }
+      end, { desc = 'Find Files' })
+
+      --[[vim.keymap.set('n', '<leader>fs', function()
+        builtin.grep_string { search = vim.fn.input 'Grep > ' }
+      end) ]]
+      --
+      vim.keymap.set('n', '<leader>s/', function()
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
         }
       end, { desc = '[S]earch [/] in Open Files' })
-]]
-      --
-      -- Shortcut for searching your Neovim configuration files
-      -- vim.keymap.set('n', '<leader>fd', builtin.find_files, { desc = 'Find Files' }0
-      vim.keymap.set('n', '<leader>fd', function()
-        builtin.find_files {
-          no_ignore = true, -- Don't respect .gitignore
-          hidden = false, -- Show dotfiles
-        }
-      end, { desc = 'Find Files' })
-      vim.keymap.set('n', '<leader>fs', function()
-        builtin.grep_string { search = vim.fn.input 'Grep > ' }
-      end)
-      vim.keymap.set('n', '<C-p>', builtin.git_files, {})
+
+      --  See `:help telescope.builtin.live_grep()` for information about particular keys
+
+      vim.keymap.set('n', '<C-p>', builtin.git_files, {}) --search git
+
       vim.keymap.set('n', '<leader>en', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
     end,
   },
   {
@@ -518,7 +562,10 @@ require('lazy').setup({
       'nvim-tree/nvim-web-devicons',
     },
     config = function()
-      require('nvim-tree').setup {}
+      require('nvim-tree').setup {
+        vim.keymap.set('n', '<leader>tt', ':NvimTreeOpen<CR>', { desc = 'nvim tree open' }),
+        vim.keymap.set('n', '<leader>tc', ':NvimTreeClose<CR>', { desc = 'nvim tree close' }),
+      }
     end,
   },
   -- LSP Plugins
@@ -616,12 +663,7 @@ require('lazy').setup({
           end
 
           -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
           map('<leader>grn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
-          --map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
 
           -- Find references for the word under your cursor.
           map('<leader>grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -635,13 +677,17 @@ require('lazy').setup({
           --  To jump back, press <C-t>.
           map('<leader>gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
 
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
-          map('<leader>gr', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
           map('<leader>gs', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
+
+          -- Execute a code action, usually your cursor needs to be on top of an error
+          -- or a suggestion from your LSP for this to activate.
+          --map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+
+          -- WARN: This is not Goto Definition, this is Goto Declaration.
+          --  For example, in C this would take you to the header.
+          --map('<leader>gr', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
