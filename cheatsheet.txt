@@ -19,6 +19,7 @@ File Searching/nav
 <leader>bp -> buffer prev
 <leader>bn -> buffer next
 <leader>/ -> fuzzy finder in current buffer
+<leader>fs -> live grep
 
 LSP:
 <leader>grn -> rename variable
@@ -32,7 +33,7 @@ LSP:
 Git
 <leader>dv -> diffview close/open (against curr branch) 
 <leader>dm -> load diffview
-cntrl+p -> search within git
+<leader>fp -> search within git
 
 Line Behavior
 normal: alt+jk -> move line
@@ -42,6 +43,10 @@ J -> join line below to curr line and keep cursor pos
 
 Yanking
 <leader>d -> delete without yank
+Y -> yank to end of line
+<leader>p -> paste line without yanking
+<leader>d -> delete without yanking
+
 
 Windows:
 <leader>sv -> split vertically

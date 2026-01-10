@@ -4,11 +4,11 @@ vim.g.maplocalleader = ' '
 local augroup = vim.api.nvim_create_augroup('UserConfig', {})
 -- Color scheme/appearance
 vim.cmd 'colorscheme industry'
---vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
---vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
---vim.api.nvim_set_hl(0, 'EndOfBuffer', { bg = 'none' })
+vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
+vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
+vim.api.nvim_set_hl(0, 'EndOfBuffer', { bg = 'none' })
 vim.g.have_nerd_font = true -- Set to true if you have Nerd Font selected in terminal
-
+vim.opt.cursorline = true -- Highlight current line
 --Column/Numbering
 vim.opt.colorcolumn = '80'
 vim.opt.number = true
@@ -69,6 +69,7 @@ vim.opt.modifiable = true -- Allow buffer modifications
 vim.o.mouse = 'a' -- Enable mouse mode
 vim.opt.guicursor =
   'n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkoff250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkoff175'
+
 --------------Visual settings----------------------------------------------------------------------
 vim.opt.termguicolors = true -- Enable 24-bit colors
 vim.opt.signcolumn = 'no' -- Always show sign column
@@ -186,6 +187,7 @@ vim.keymap.set('n', '<C-A-h>', '<C-w>H', { desc = 'Move window to the left' })
 vim.keymap.set('n', '<C-A-l>', '<C-w>L', { desc = 'Move window to the right' })
 vim.keymap.set('n', '<C-A-j>', '<C-w>J', { desc = 'Move window to the lower' })
 vim.keymap.set('n', '<C-A-k>', '<C-w>K', { desc = 'Move window to the upper' })
+
 -- Auto-resize splits when window is resized
 vim.api.nvim_create_autocmd('VimResized', {
   group = augroup,
@@ -236,8 +238,7 @@ vim.g.clipboard = {
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank to end of line' }) -- Y to EOL
 vim.keymap.set('x', '<leader>p', '"_dP', { desc = 'Paste without yanking' })
 vim.keymap.set({ 'n', 'v' }, '<leader>d', '"_d', { desc = 'Delete without yanking' })
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
+
 --  See `:help vim.hl.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -246,6 +247,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.hl.on_yank()
   end,
 })
+
 -- Copy Full File-Path
 vim.keymap.set('n', '<leader>pa', function()
   local path = vim.fn.expand '%:p'
@@ -538,7 +540,7 @@ require('lazy').setup({
         builtin.grep_string { search = vim.fn.input 'Grep > ' }
       end) ]]
       --
-      vim.keymap.set('n', '<leader>s/', function()
+      vim.keymap.set('n', '<leader>fs', function()
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
@@ -547,7 +549,7 @@ require('lazy').setup({
 
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
 
-      vim.keymap.set('n', '<C-p>', builtin.git_files, {}) --search git
+      vim.keymap.set('n', '<leader>fp', builtin.git_files, {}) --search git
 
       vim.keymap.set('n', '<leader>en', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
@@ -564,7 +566,7 @@ require('lazy').setup({
     config = function()
       require('nvim-tree').setup {
         vim.keymap.set('n', '<leader>tt', ':NvimTreeOpen<CR>', { desc = 'nvim tree open' }),
-        vim.keymap.set('n', '<leader>tc', ':NvimTreeClose<CR>', { desc = 'nvim tree close' }),
+        vim.keymap.set('n', '<leader>cc', ':NvimTreeClose<CR>', { desc = 'nvim tree close' }),
       }
     end,
   },
@@ -826,7 +828,7 @@ require('lazy').setup({
           --
         },
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
