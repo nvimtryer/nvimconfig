@@ -19,7 +19,7 @@ File Searching/nav
 <leader>bp -> buffer prev
 <leader>bn -> buffer next
 <leader>/ -> fuzzy finder in current buffer
-<leader>fs -> live grep
+<leader>lg -> live grep
 
 LSP:
 <leader>grn -> rename variable
@@ -27,7 +27,7 @@ LSP:
 <leader>gs -> fuzzy find all symbols in curr doc
 <leader>gd -> get definition -> cntrl+t to go back
 <leader>gD -> get implementation
-<leader>gS -> fuzzyfind all symbols in workspace
+<leader>gw -> fuzzyfind all symbols in workspace
 <leader>gt -> jump to type of word
 
 Git

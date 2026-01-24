@@ -3,6 +3,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 local augroup = vim.api.nvim_create_augroup('UserConfig', {})
 -- Color scheme/appearance
+vim.opt.termguicolors = true
 vim.cmd 'colorscheme industry'
 vim.api.nvim_set_hl(0, 'Normal', { bg = 'none' })
 vim.api.nvim_set_hl(0, 'NormalNC', { bg = 'none' })
@@ -45,9 +46,6 @@ vim.keymap.set('n', '<leader>fe', ':Explore<CR>', { desc = 'Open file explorer' 
 vim.keymap.set('n', '<leader>ff', ':find ', { desc = 'Find file' })
 vim.keymap.set('n', '<leader>dm', ':DiffviewOpen ', { desc = 'load Diffview to put in file name' })
 vim.keymap.set('n', '<leader>c', ':nohlsearch<CR>', { desc = 'Clear search highlights' })
-
-------------CHEATSHEET-----------------------------------------------------------------
-vim.keymap.set('n', '<leader>cs', ':vsplit<CR> <C-w><C-l> :find ~/.config/nvim/cheatsheet.txt<CR>', { desc = 'Find file' })
 
 -- Command-line completion
 vim.opt.wildmenu = true
@@ -168,7 +166,7 @@ vim.keymap.set('n', 'J', 'mzJ`z', { desc = 'Join lines and keep cursor position'
 
 --------------------------------------WINDOWS---------------------------------------
 vim.opt.splitbelow = true -- Horizontal splits go below
-vim.opt.splitright = false -- Vertical splits go left
+vim.opt.splitright = true -- Vertical splits go right
 
 vim.keymap.set('n', '<leader>sv', ':vsplit<CR> <C-w><C-l>', { desc = 'Split window vertically' })
 vim.keymap.set('n', '<leader>sh', ':split<CR> <C-w><C-k>', { desc = 'Split window horizontally' })
@@ -188,6 +186,22 @@ vim.keymap.set('n', '<C-A-l>', '<C-w>L', { desc = 'Move window to the right' })
 vim.keymap.set('n', '<C-A-j>', '<C-w>J', { desc = 'Move window to the lower' })
 vim.keymap.set('n', '<C-A-k>', '<C-w>K', { desc = 'Move window to the upper' })
 
+------------CHEATSHEET-----------------------------------------------------------------
+vim.keymap.set('n', '<leader>cs', function()
+  -- We use a Lua function to handle the path more cleanly
+  local path = '/home/matthewbaum/.config/nvim/cheatsheet.txt'
+  vim.cmd('vsplit ' .. path)
+end)
+vim.keymap.set('n', '<leader>su', function()
+  -- We use a Lua function to handle the path more cleanly
+  local path = '/mnt/c/Users/MatthewBaum/Documents/standup.txt'
+  vim.cmd('vsplit ' .. path)
+end)
+vim.keymap.set('n', '<leader>td', function()
+  -- We use a Lua function to handle the path more cleanly
+  local path = '/mnt/c/Users/MatthewBaum/Documents/todo.txt'
+  vim.cmd('vsplit ' .. path)
+end)
 -- Auto-resize splits when window is resized
 vim.api.nvim_create_autocmd('VimResized', {
   group = augroup,
@@ -540,7 +554,7 @@ require('lazy').setup({
         builtin.grep_string { search = vim.fn.input 'Grep > ' }
       end) ]]
       --
-      vim.keymap.set('n', '<leader>fs', function()
+      vim.keymap.set('n', '<leader>lg', function()
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
@@ -693,7 +707,7 @@ require('lazy').setup({
 
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
-          map('<leader>gS', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
+          map('<leader>gw', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
 
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
